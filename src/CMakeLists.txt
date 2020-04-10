@@ -12,3 +12,8 @@ add_executable(cindel
 find_package(Curses REQUIRED)
 include_directories(cindel ${CURSES_INCLUDE_DIRS})
 target_link_libraries(cindel ${CURSES_LIBRARIES})
+
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost COMPONENTS system REQUIRED)
+include_directories(${Boost_INCLUDE_DIR})
+target_link_libraries(cindel ${BOOST_LIBRARIES})
