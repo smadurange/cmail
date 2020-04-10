@@ -1,17 +1,15 @@
-#include <boost/asio/ssl/context.hpp>
-#include <boost/asio/ssl/stream.hpp>
-#include <boost/asio/ssl/verify_mode.hpp>
-#include <boost/system/error_code.hpp>
 #include <iostream>
-#include <ostream>
 #include <string>
-#include <sstream>
 
 #include <boost/asio.hpp>
 #include <boost/asio/connect.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/ssl.hpp>
+#include <boost/asio/ssl/context.hpp>
+#include <boost/asio/ssl/stream.hpp>
+#include <boost/asio/ssl/verify_mode.hpp>
+#include <boost/system/error_code.hpp>
 
 int main(int argc, char *argv[])
 {
