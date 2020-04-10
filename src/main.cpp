@@ -38,6 +38,8 @@ int main(int argc, char *argv[])
         if(!connErr)
         {
             std::cout << "Connected to " << endpoint << std::endl;
+            sslSocket.handshake(boost::asio::ssl::stream<boost::asio::ip::tcp::socket>::client);
+            std::cout << "SSL handshake success." << std::endl;
             break;
         };
     }
