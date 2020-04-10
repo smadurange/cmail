@@ -4,7 +4,7 @@ project(Cindel LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_executable(cindel 
     main.cpp
@@ -13,6 +13,10 @@ add_executable(cindel
 find_package(Curses REQUIRED)
 include_directories(cindel ${CURSES_INCLUDE_DIRS})
 target_link_libraries(cindel ${CURSES_LIBRARIES})
+
+find_package(OpenSSL REQUIRED)
+include_directories(${OPENSSL_INCLUDE_DIRS})
+target_link_libraries(cindel ${OPENSSL_LIBRARIES})
 
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system REQUIRED)
