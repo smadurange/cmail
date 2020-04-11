@@ -1,4 +1,3 @@
-#include <iostream>
 #include <istream>
 #include <stdexcept>
 #include <string>
@@ -8,6 +7,8 @@
 #include <boost/system/error_code.hpp>
 #include <boost/asio/read_until.hpp>
 #include <boost/asio/streambuf.hpp>
+
+#include <spdlog/spdlog.h>
 
 #include "ImapClient.hpp"
 
@@ -34,19 +35,15 @@ void cindel::ImapClient::Connect(const std::string &hostname, const std::string 
     }
     else
     {
-        // Log trace.
         boost::asio::ip::tcp::endpoint endpoint = *iter;
-        std::cout << "Connected to host: " << endpoint << std::endl;
+        spdlog::debug("Connected to IMAP server: " + endpoint.address().to_string());
     }
 
     boost::asio::streambuf buf;
-
     boost::asio::read_until(socket, buf, '\n', error);
     std::istream is(&buf);
     std::string response;
     std::getline(is, response);
     buf.consume(buf.size());
-
-    // Log trace
-    std::cout << response << std::endl;
+    spdlog::trace(response);
 }
