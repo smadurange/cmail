@@ -42,12 +42,8 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
     socket.handshake(ssl::stream<ip::tcp::socket>::client, error);
     if (error) throw std::runtime_error("SSL handshake failed: " + error.message());
 
-    boost::asio::streambuf buf;
-    boost::asio::read_until(socket, buf, '\n', error);
-    std::istream is(&buf);
-    std::string response;
-    std::getline(is, response);
-    buf.consume(buf.size());
+    std::string response = getReply(error);
+    if (error) throw std::runtime_error("Failed to get a response from server: " + error.message());
     spdlog::trace("Server responded to connection request with\n" + response);
 }
 
