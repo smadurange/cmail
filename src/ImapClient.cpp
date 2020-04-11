@@ -1,14 +1,15 @@
-#include <boost/asio/read_until.hpp>
-#include <boost/asio/streambuf.hpp>
+#include <iostream>
 #include <istream>
 #include <stdexcept>
+#include <string>
 
 #include <boost/asio/connect.hpp>
 #include <boost/asio/io_service.hpp>
 #include <boost/system/error_code.hpp>
-#include <string>
+#include <boost/asio/read_until.hpp>
+#include <boost/asio/streambuf.hpp>
 
-#include "ImapClient.hpp"a
+#include "ImapClient.hpp"
 
 cindel::ImapClient::ImapClient(boost::asio::io_service &ioService)
     : socket(ioService), resolver(ioService)

@@ -8,6 +8,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_executable(cindel 
     main.cpp
+    ImapClient.hpp
+    ImapClient.cpp
 )
 
 find_package(Curses REQUIRED)
