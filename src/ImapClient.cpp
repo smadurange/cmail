@@ -17,7 +17,7 @@ cindel::ImapClient::ImapClient(boost::asio::io_service &ioService)
 {
 }
 
-void cindel::ImapClient::Connect(const std::string &hostname, const std::string &port)
+void cindel::ImapClient::connect(const std::string &hostname, const std::string &port)
 {
     boost::system::error_code error;
     boost::asio::ip::tcp::resolver::iterator endpoints = resolver.resolve(hostname, port, error);

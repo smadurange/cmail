@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 
     try
     {
-        imapClient.Connect(hostname, port);
+        imapClient.connect(hostname, port);
     }
     catch (const std::exception &e)
     {

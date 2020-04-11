@@ -10,7 +10,7 @@ namespace cindel
     public:
         ImapClient(boost::asio::io_service &ioService);
         ~ImapClient() = default;
-        void Connect(const std::string &hostname, const std::string &port);
+        void connect(const std::string &hostname, const std::string &port);
 
     private:
         std::string hostname;
