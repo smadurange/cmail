@@ -1,8 +1,10 @@
-#include <boost/asio.hpp>
 #include <exception>
+
+#include <boost/asio.hpp>
+#include <boost/asio/ssl.hpp>
+
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
-
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "ImapClient.hpp"
@@ -14,16 +16,17 @@ int main(int argc, char *argv[])
     spdlog::set_level(spdlog::level::trace);
 
     const std::string hostname = "outlook.office365.com";
-    const std::string port = "143";
+    const std::string port = "993";
     const std::string username = "test.20200410@outlook.com";
     const std::string password = "MN3SbbTVYviMi55F";
     
     boost::asio::io_service ioService;
-    auto imapClient = cindel::ImapClient(ioService);
+    boost::asio::ssl::context sslContext(boost::asio::ssl::context::sslv23);
+    auto imapClient = cindel::ImapClient(ioService, sslContext);
 
     try
     {
-        imapClient.Connect(hostname, port);
+        imapClient.connect(hostname, port);
     }
     catch (const std::exception &e)
     {
