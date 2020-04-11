@@ -16,11 +16,14 @@ namespace cindel
                 boost::asio::ssl::context &sslContext);
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
+        void login(const std::string &username, const std::string &password);
 
     private:
-        std::string hostname;
-        std::string port;
-        boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
-        boost::asio::ip::tcp::resolver resolver;
+        std::string hostname_;
+        std::string port_;
+        std::string username_;
+        std::string password_;
+        boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket_;
+        boost::asio::ip::tcp::resolver resolver_;
     };
 }
