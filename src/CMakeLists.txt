@@ -24,3 +24,6 @@ set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 target_link_libraries(cindel ${BOOST_LIBRARIES})
+
+find_package(spdlog REQUIRED)
+target_link_libraries(cindel spdlog::spdlog)
