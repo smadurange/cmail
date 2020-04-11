@@ -1,8 +1,9 @@
-#include <boost/asio.hpp>
 #include <exception>
+
+#include <boost/asio.hpp>
+
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
-
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "ImapClient.hpp"
