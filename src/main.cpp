@@ -60,6 +60,8 @@ int main(int argc, char *argv[])
     boost::system::error_code readError;
     boost::asio::streambuf sb;
     boost::asio::read_until(socket, sb, '\n', readError);
+    sb.consume(sb.size());
+    boost::asio::read_until(socket, sb, '\n', readError);
 
     if (readError)
     {
