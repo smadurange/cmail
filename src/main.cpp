@@ -1,4 +1,5 @@
 #include <boost/asio/buffer.hpp>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/read.hpp>
 #include <boost/asio/write.hpp>
 #include <iostream>
@@ -24,47 +25,23 @@ int main(int argc, char *argv[])
     const std::string port = "993";
     
     boost::asio::io_service ioService;
-    
-    ssl::context ctx(ssl::context::sslv23);
-    ssl::stream<ip::tcp::socket> socket(ioService, ctx);
-    socket.set_verify_mode(ssl::verify_none);
+
+    ip::tcp::socket socket(ioService);
 
     ip::tcp::resolver resolver(ioService);
-    ip::tcp::resolver::query query(hostname, port);
-    ip::tcp::resolver::iterator endpointIter = resolver.resolve(query);
-    ip::tcp::resolver::iterator end;
+    ip::tcp::resolver::iterator endpoints = resolver.resolve(hostname, port);
     
-    while(endpointIter != end)
+    boost::system::error_code connErr;
+    ip::tcp::resolver::iterator connectedEndpointIter =  boost::asio::connect(socket, endpoints);
+    ip::tcp::endpoint connectedEndpoint = *connectedEndpointIter;
+    
+    if(connErr)
     {
-        ip::tcp::endpoint endpoint = *endpointIter++;
-        std::cout << "Trying to connect to " << endpoint << std::endl;
-        boost::system::error_code connErr;
-        socket.lowest_layer().connect(endpoint, connErr);
-        
-        if(!connErr)
-        {
-            std::cout << "Connected to " << endpoint << std::endl;
-            socket.handshake(ssl::stream<ip::tcp::socket>::client);
-            std::cout << "SSL handshake success." << std::endl;
-            break;
-        };
+        std::cout << "Failed to connect to IMAP server: " << connErr.message() << std::endl;
+        return -1;
     }
 
-    // Login to mailbox.
-    std::string username = "test.20200410@outlook.com";
-    std::string password = "MN3SbbTVYviMi55F";
-    std::stringstream ss;
-    ss << "$ LOGIN " << username << " " << password;
-    const char *req = ss.str().c_str();
-    char data[500];
-    strcpy(data, req);
-    boost::asio::write(socket, boost::asio::buffer(data, sizeof(data)));
-    std::cout << "Finished writing to socket." << std::endl;
+    std::cout << "Connected to IMAP server: " << connectedEndpoint << std::endl;
 
-    char buffer[10000];
-    boost::asio::read(socket, boost::asio::buffer(buffer));
-    std::string response = std::string(buffer);
-    std::cout << "Received response: " << response << std::endl;
-    
     return 0;
 }
