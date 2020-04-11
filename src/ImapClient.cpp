@@ -1,3 +1,4 @@
+#include <cstring>
 #include <istream>
 #include <stdexcept>
 #include <string>
@@ -29,7 +30,7 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
 {
     boost::system::error_code error;
     ip::tcp::resolver::iterator endpoints = resolver.resolve(hostname, port, error);
-    if (error) throw std::runtime_error("Failed to resolve hostname: " + error.message());
+    if(error) throw std::runtime_error("Failed to resolve hostname: " + error.message());
     
     spdlog::trace("Sending connection request to server.");
     ip::tcp::resolver::iterator it = boost::asio::connect(socket.lowest_layer(), endpoints, error);
@@ -40,25 +41,48 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
     socket.set_verify_mode(ssl::verify_none);
     spdlog::warn("SSL certificate validation is set to verify_none.");
     socket.handshake(ssl::stream<ip::tcp::socket>::client, error);
-    if (error) throw std::runtime_error("SSL handshake failed: " + error.message());
+    if(error) throw std::runtime_error("SSL handshake failed: " + error.message());
 
     std::string response = getReply(error);
-    if (error) throw std::runtime_error("Failed to get a response from server: " + error.message());
+    if(error) throw std::runtime_error("Failed to get a response from server: " + error.message());
     spdlog::trace("Server responded to connection request with\n" + response);
 }
 
-void cindel::ImapClient::login(const std::string &username, const std::string &password)
+cindel::ImapStatusCode cindel::ImapClient::login(const std::string &username, const std::string &password)
 {
     const std::string command = "A001 LOGIN " + username + " " + password + "\r\n";
     
     boost::system::error_code error;
     auto bsent = boost::asio::write(socket, boost::asio::buffer(command), error);
-    if (error) throw std::runtime_error("Failed to send login request to server: " + error.message());
-    spdlog::trace("Sent " + std::to_string(bsent) + " bytes in login request.");
+    if(error)
+    {
+        spdlog::error("Failed to send login request to server: " + error.message());
+        return ImapStatusCode::ConnectionError;
+    }
 
+    spdlog::trace("Sent " + std::to_string(bsent) + " bytes in login request.");
     std::string reply = getReply(error);
-    if (error) throw std::runtime_error("Failed to get a reply from server: " + error.message());
-    spdlog::trace("Server responded to login request with\n" + reply); 
+    if(error)
+    {
+        spdlog::error("Failed to get a reply for login request from server: " + error.message());
+        return ImapStatusCode::ConnectionError;
+    }
+    
+    spdlog::trace("Server responded to login request with\n" + reply);
+
+    if(reply.compare("A001 OK LOGIN completed."))
+    {
+        return ImapStatusCode::Success;
+    }
+    else if(reply.compare("A001 NO LOGIN failed."))
+    {
+        return ImapStatusCode::AuthenticationError;
+    }
+    else
+    {
+        spdlog::error("Unknown server response to login request: " + reply);
+        return ImapStatusCode::InternalError;
+    }
 }
 
 std::string  cindel::ImapClient::getReply(boost::system::error_code &error)

@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 
 #include <boost/asio.hpp>
@@ -6,6 +7,8 @@
 #include <boost/asio/ssl.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/error_code.hpp>
+
+#include "ImapStatusCode.hpp"
 
 namespace cindel
 {
@@ -17,8 +20,8 @@ namespace cindel
                 boost::asio::ssl::context &sslContext);
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
-        void login(const std::string &username, const std::string &password);
-
+        cindel::ImapStatusCode login(const std::string &username, const std::string &password);
+        
     private:
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
         boost::asio::ip::tcp::resolver resolver;

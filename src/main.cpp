@@ -6,8 +6,10 @@
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <string>
 
 #include "ImapClient.hpp"
+#include "ImapStatusCode.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -36,7 +38,19 @@ int main(int argc, char *argv[])
 
     try
     {
-        imapClient.login(username, password);
+        cindel::ImapStatusCode loginResult = imapClient.login(username, password);
+        switch (loginResult)
+        {
+            case cindel::ImapStatusCode::Success:
+                spdlog::info("Login success!");
+                break;
+            case cindel::ImapStatusCode::AuthenticationError:
+                spdlog::error("Invalid credentials.");
+                break;
+            default:
+                spdlog::error("Login failed with unknown status");
+                break;
+        }
     }
     catch(const std::exception &e)
     {
