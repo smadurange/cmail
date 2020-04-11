@@ -10,6 +10,7 @@ add_executable(cindel
     main.cpp
     ImapClient.hpp
     ImapClient.cpp
+    ImapStatusCode.hpp
 )
 
 find_package(Curses REQUIRED)
