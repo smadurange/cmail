@@ -22,5 +22,7 @@ namespace cindel
     private:
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
         boost::asio::ip::tcp::resolver resolver;
+
+        std::string getReply(boost::system::error_code &error);
     };
 }

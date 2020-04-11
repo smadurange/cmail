@@ -28,11 +28,21 @@ int main(int argc, char *argv[])
     {
         imapClient.connect(hostname, port);
     }
-    catch (const std::exception &e)
+    catch(const std::exception &e)
     {
         spdlog::error("IMAP connection error: " + std::string(e.what()) );
         return -1;
-    }        
+    }
+
+    try
+    {
+        imapClient.login(username, password);
+    }
+    catch(const std::exception &e)
+    {
+        spdlog::error("Login failed: " + std::string(e.what()));
+        return -1;
+    }    
 
     ioService.run();
 
