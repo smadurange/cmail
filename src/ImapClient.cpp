@@ -35,6 +35,7 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
     spdlog::debug("Connected to IMAP server: " + endpoint.address().to_string());
 
     socket.set_verify_mode(ssl::verify_none);
+    spdlog::warn("SSL certificate validation is set to verify_none.");
     socket.handshake(ssl::stream<ip::tcp::socket>::client, error);
     if (error) throw std::runtime_error("SSL handshake failed: " + error.message());
 
