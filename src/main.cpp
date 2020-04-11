@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     }
     catch(const std::exception &e)
     {
-        spdlog::error("Login failed: " + std::string(e.what()));
+        spdlog::error("Login failed with exception: " + std::string(e.what()));
         return -1;
     }    
 
