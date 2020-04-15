@@ -1,6 +1,5 @@
 #pragma once
 #include <atomic>
-#include <memory>
 #include <string>
 
 #include <boost/asio.hpp>
@@ -17,9 +16,7 @@ namespace cindel
     class ImapClient
     {
     public:
-        ImapClient(
-                boost::asio::io_service &ioService,
-                boost::asio::ssl::context &sslContext);
+        ImapClient(boost::asio::io_service &ioService, boost::asio::ssl::context &sslContext);
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
         cindel::ImapStatusCode login(const std::string &username, const std::string &password);

@@ -1,6 +1,4 @@
-#include <cstring>
 #include <istream>
-#include <memory>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -17,9 +15,7 @@
 #include <boost/system/error_code.hpp>
 
 #include <spdlog/spdlog.h>
-#include <vector>
 
-#include "Email.hpp"
 #include "ImapClient.hpp"
 
 namespace ip = boost::asio::ip;
