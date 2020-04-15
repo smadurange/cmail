@@ -1,4 +1,6 @@
 #pragma once
+#include <atomic>
+#include <memory>
 #include <string>
 
 #include <boost/asio.hpp>
@@ -21,11 +23,12 @@ namespace cindel
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
         cindel::ImapStatusCode login(const std::string &username, const std::string &password);
-        
+
     private:
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
         boost::asio::ip::tcp::resolver resolver;
+        std::atomic<int> commandCounter{0}; 
 
-        std::string getReply(boost::system::error_code &error);
+        std::string execute(const std::string &command);
     };
 }

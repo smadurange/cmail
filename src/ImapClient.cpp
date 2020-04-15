@@ -1,5 +1,7 @@
 #include <cstring>
 #include <istream>
+#include <memory>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -15,7 +17,9 @@
 #include <boost/system/error_code.hpp>
 
 #include <spdlog/spdlog.h>
+#include <vector>
 
+#include "Email.hpp"
 #include "ImapClient.hpp"
 
 namespace ip = boost::asio::ip;
@@ -43,58 +47,66 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
     socket.handshake(ssl::stream<ip::tcp::socket>::client, error);
     if(error) throw std::runtime_error("SSL handshake failed: " + error.message());
 
-    std::string response = getReply(error);
+    boost::asio::streambuf buffer;
+    boost::asio::read_until(socket, buffer, '\n', error);
     if(error) throw std::runtime_error("Failed to get a response from server: " + error.message());
+    std::istream is(&buffer);
+    std::string response;
+    std::getline(is, response);
     spdlog::trace("Server responded to connection request with\n" + response);
 }
 
 cindel::ImapStatusCode cindel::ImapClient::login(const std::string &username, const std::string &password)
 {
-    const std::string command = "A001 LOGIN " + username + " " + password + "\r\n";
-    
-    boost::system::error_code error;
-    auto bsent = boost::asio::write(socket, boost::asio::buffer(command), error);
-    if(error)
-    {
-        spdlog::error("Failed to send login request to server: " + error.message());
-        return ImapStatusCode::ConnectionError;
-    }
+    const std::string command = "LOGIN " + username + " " + password + "\r\n";
+    std::string response = execute(command);
 
-    spdlog::trace("Sent " + std::to_string(bsent) + " bytes in login request.");
-    std::string reply = getReply(error);
-    if(error)
+    if(response.empty())
     {
-        spdlog::error("Failed to get a reply for login request from server: " + error.message());
         return ImapStatusCode::ConnectionError;
     }
     
-    spdlog::trace("Server responded to login request with\n" + reply);
-
-    if(reply.compare("A001 OK LOGIN completed."))
+    if(response.compare("A001 OK LOGIN completed."))
     {
         return ImapStatusCode::Success;
     }
-    else if(reply.compare("A001 NO LOGIN failed."))
+    else if(response.compare("A001 NO LOGIN failed."))
     {
         return ImapStatusCode::AuthenticationError;
     }
     else
     {
-        spdlog::error("Unknown server response to login request: " + reply);
+        spdlog::error("Unknown server response to login request: " + response);
         return ImapStatusCode::InternalError;
     }
 }
 
-std::string  cindel::ImapClient::getReply(boost::system::error_code &error)
+std::string cindel::ImapClient::execute(const std::string &command)
 {
-    boost::asio::streambuf buf;
-    boost::asio::read_until(socket, buf, '\n', error);
-    if(error) return std::string();
+    std::stringstream ss;
+    ss << ++commandCounter << " " << command << "\r\n";
+    std::string cmd = ss.str();
+    spdlog::trace("Executing command: " + cmd);
+    boost::system::error_code error;
+    boost::asio::write(socket, boost::asio::buffer(cmd), error);
+    
+    if(error)
+    {
+        spdlog::error("Failed to dispatch command " + cmd + " because " + error.message());
+        return ""; 
+    }
+    
+    boost::asio::streambuf buffer;
+    boost::asio::read_until(socket, buffer, '\n', error);
+   
+    if(error)
+    {
+        spdlog::error("Failed to receive response for command " + cmd + " because " + error.message());
+        return "";
+    }
 
-    std::istream is(&buf);
-    std::string reply;
-    std::getline(is, reply);
-    buf.consume(buf.size());
-    return reply;
+    std::istream is(&buffer);
+    std::string response;
+    std::getline(is, response);
+    return response;
 }
-
