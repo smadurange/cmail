@@ -82,11 +82,11 @@ cindel::ImapStatusCode cindel::ImapClient::login(const std::string &username, co
 std::string cindel::ImapClient::execute(const std::string &command)
 {
     std::stringstream ss;
-    ss << ++commandCounter << " " << command << "\r\n";
+    ss << ++commandCounter << " " << command;
     std::string cmd = ss.str();
-    spdlog::trace("Executing command: " + cmd);
+    spdlog::trace("C: " + cmd);
     boost::system::error_code error;
-    boost::asio::write(socket, boost::asio::buffer(cmd), error);
+    boost::asio::write(socket, boost::asio::buffer(cmd.append("\r\n")), error);
     
     if(error)
     {
@@ -106,5 +106,6 @@ std::string cindel::ImapClient::execute(const std::string &command)
     std::istream is(&buffer);
     std::string response;
     std::getline(is, response);
+    spdlog::trace("S: " + response);
     return response;
 }
