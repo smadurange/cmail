@@ -54,8 +54,10 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
 
 cindel::ImapStatusCode cindel::ImapClient::login(const std::string &username, const std::string &password)
 {
-    const std::string command = "LOGIN " + username + " " + password;
-    std::string response = execute(command);
+    std::string cmd;
+    cmd.reserve(username.length() + password.length() + 7);
+    cmd.append("LOGIN ").append(username).append(" ").append(password);
+    std::string response = execute(cmd);
 
     if(response.empty())
     {
