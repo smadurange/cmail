@@ -80,6 +80,18 @@ cindel::ImapStatusCode cindel::ImapClient::login(const std::string &username, co
     }
 }
 
+std::vector<std::string>::iterator cindel::ImapClient::fetchMail(const int count)
+{
+    std::string cmd = "SELECT INBOX";
+    std::string response = execute(cmd);
+    if(response.empty()) return std::vector<std::string>::iterator();
+    
+    cmd = "FETCH 1:" + std::to_string(count) + " (FLAGS BODY.PEEK[HEADER.FIELDS (SUBJECT)])";
+    response = execute(cmd);
+    
+    return std::vector<std::string>::iterator();
+}
+
 std::string cindel::ImapClient::execute(const std::string &command)
 {
     std::stringstream ss;
@@ -103,22 +115,19 @@ std::string cindel::ImapClient::execute(const std::string &command)
         spdlog::error("Failed to receive response for command " + cmd + " because " + error.message());
         return "";
     }
-
+    
+    ss.str(std::string());
+    ss.clear();
     std::istream is(&buffer);
-    std::string response;
-    std::getline(is, response);
+    std::string line;
+    while(std::getline(is, line))
+    {
+       ss << line << std::endl; 
+    }
+    
+    std::string response = ss.str();
+    // Pop the last line feed character for better formatting.
+    if(!response.empty()) response.pop_back();
     spdlog::trace("S: " + response);
     return response;
-}
-
-std::vector<std::string>::iterator cindel::ImapClient::fetchMail(const int count)
-{
-    std::string cmd = "SELECT INBOX";
-    std::string response = execute(cmd);
-    if(response.empty()) return std::vector<std::string>::iterator();
-    
-    cmd = "FETCH 1:" + std::to_string(count) + " (FLAGS BODY.PEEK[HEADER.FIELDS (SUBJECT)])";
-    response = execute(cmd);
-    
-    return std::vector<std::string>::iterator();
 }
