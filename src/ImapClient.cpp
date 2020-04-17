@@ -15,6 +15,7 @@
 #include <boost/system/error_code.hpp>
 
 #include <spdlog/spdlog.h>
+#include <vector>
 
 #include "ImapClient.hpp"
 
@@ -108,4 +109,16 @@ std::string cindel::ImapClient::execute(const std::string &command)
     std::getline(is, response);
     spdlog::trace("S: " + response);
     return response;
+}
+
+std::vector<std::string>::iterator cindel::ImapClient::fetchMail(const int count)
+{
+    std::string cmd = "SELECT INBOX";
+    std::string response = execute(cmd);
+    if(response.empty()) return std::vector<std::string>::iterator();
+    
+    cmd = "FETCH 1:" + std::to_string(count) + " (FLAGS BODY.PEEK[HEADER.FIELDS (SUBJECT)])";
+    response = execute(cmd);
+    
+    return std::vector<std::string>::iterator();
 }

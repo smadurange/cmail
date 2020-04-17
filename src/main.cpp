@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     auto client = cindel::ImapClient(ioService, sslContext);
     client.connect(hostname, port);
     client.login(username, password);
+    client.fetchMail(1);
     ioService.run();
 
     return 0;
