@@ -1,7 +1,11 @@
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 #include <istream>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <boost/asio/connect.hpp>
 #include <boost/asio/buffer.hpp>
@@ -15,7 +19,6 @@
 #include <boost/system/error_code.hpp>
 
 #include <spdlog/spdlog.h>
-#include <vector>
 
 #include "ImapClient.hpp"
 
@@ -80,14 +83,17 @@ cindel::ImapStatusCode cindel::ImapClient::login(const std::string &username, co
     }
 }
 
-std::vector<std::string>::iterator cindel::ImapClient::fetchMail(const int count)
+std::vector<std::string>::iterator cindel::ImapClient::fetch(const int days)
 {
     std::string cmd = "SELECT INBOX";
     std::string response = execute(cmd);
     if(response.empty()) return std::vector<std::string>::iterator();
-    
-    cmd = "FETCH 1:" + std::to_string(count) + " (FLAGS BODY.PEEK[HEADER.FIELDS (SUBJECT)])";
-    response = execute(cmd);
+   
+    std::stringstream ss;
+    auto tp = std::chrono::system_clock::now() - std::chrono::hours(days * 24);
+    auto t = std::chrono::system_clock::to_time_t(tp);
+    ss << "SEARCH SINCE " << std::put_time(std::localtime(&t), "%d-%b-%Y");
+    response = execute(ss.str());
     
     return std::vector<std::string>::iterator();
 }
