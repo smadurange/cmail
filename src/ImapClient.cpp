@@ -106,7 +106,6 @@ std::string cindel::ImapClient::execute(const std::string &command)
     spdlog::trace("C: " + cmd);
     boost::system::error_code error;
     boost::asio::write(socket, boost::asio::buffer(cmd.append("\r\n")), error);
-    
     if(error)
     {
         spdlog::error("Failed to dispatch command " + cmd + " because " + error.message());
@@ -115,7 +114,6 @@ std::string cindel::ImapClient::execute(const std::string &command)
     
     boost::asio::streambuf buffer;
     boost::asio::read_until(socket, buffer, '\n', error);
-   
     if(error)
     {
         spdlog::error("Failed to receive response for command " + cmd + " because " + error.message());
