@@ -2,6 +2,7 @@
 #include <ctime>
 #include <iomanip>
 #include <istream>
+#include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -62,7 +63,8 @@ bool cindel::ImapClient::login(const std::string &username, const std::string &p
     cmd.reserve(username.length() + password.length() + 7);
     cmd.append("LOGIN ").append(username).append(" ").append(password);
     std::string response = execute(cmd);
-    return response.compare("A001 OK LOGIN completed.");
+    std::regex rgx("OK LOGIN completed.");
+    return std::regex_search(response, rgx);
 }
 
 std::vector<std::string>::iterator cindel::ImapClient::fetch(const int days)
