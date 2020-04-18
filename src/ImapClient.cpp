@@ -1,7 +1,12 @@
-#include <cstring>
+#include <chrono>
+#include <ctime>
+#include <iomanip>
 #include <istream>
+#include <regex>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <boost/asio/connect.hpp>
 #include <boost/asio/buffer.hpp>
@@ -43,58 +48,74 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
     socket.handshake(ssl::stream<ip::tcp::socket>::client, error);
     if(error) throw std::runtime_error("SSL handshake failed: " + error.message());
 
-    std::string response = getReply(error);
+    boost::asio::streambuf buffer;
+    boost::asio::read_until(socket, buffer, '\n', error);
     if(error) throw std::runtime_error("Failed to get a response from server: " + error.message());
+    std::istream is(&buffer);
+    std::string response;
+    std::getline(is, response);
     spdlog::trace("Server responded to connection request with\n" + response);
 }
 
-cindel::ImapStatusCode cindel::ImapClient::login(const std::string &username, const std::string &password)
+bool cindel::ImapClient::login(const std::string &username, const std::string &password)
 {
-    const std::string command = "A001 LOGIN " + username + " " + password + "\r\n";
+    std::string cmd;
+    cmd.reserve(username.length() + password.length() + 7);
+    cmd.append("LOGIN ").append(username).append(" ").append(password);
+    std::string response = execute(cmd);
+    std::regex rgx("OK LOGIN completed.");
+    return std::regex_search(response, rgx);
+}
+
+std::vector<std::string>::iterator cindel::ImapClient::fetch(const int days)
+{
+    std::string cmd = "SELECT INBOX";
+    std::string response = execute(cmd);
+    if(response.empty()) return std::vector<std::string>::iterator();
+   
+    std::stringstream ss;
+    auto tp = std::chrono::system_clock::now() - std::chrono::hours(days * 24);
+    auto t = std::chrono::system_clock::to_time_t(tp);
+    ss << "SEARCH SINCE " << std::put_time(std::localtime(&t), "%d-%b-%Y");
+    response = execute(ss.str());
     
+    return std::vector<std::string>::iterator();
+}
+
+std::string cindel::ImapClient::execute(const std::string &command)
+{
+    std::stringstream ss;
+    ss << ++commandCounter << " " << command;
+    std::string cmd = ss.str();
+    spdlog::trace("C: " + cmd);
     boost::system::error_code error;
-    auto bsent = boost::asio::write(socket, boost::asio::buffer(command), error);
+    boost::asio::write(socket, boost::asio::buffer(cmd.append("\r\n")), error);
     if(error)
     {
-        spdlog::error("Failed to send login request to server: " + error.message());
-        return ImapStatusCode::ConnectionError;
-    }
-
-    spdlog::trace("Sent " + std::to_string(bsent) + " bytes in login request.");
-    std::string reply = getReply(error);
-    if(error)
-    {
-        spdlog::error("Failed to get a reply for login request from server: " + error.message());
-        return ImapStatusCode::ConnectionError;
+        spdlog::error("Failed to dispatch command " + cmd + " because " + error.message());
+        return ""; 
     }
     
-    spdlog::trace("Server responded to login request with\n" + reply);
-
-    if(reply.compare("A001 OK LOGIN completed."))
+    boost::asio::streambuf buffer;
+    boost::asio::read_until(socket, buffer, '\n', error);
+    if(error)
     {
-        return ImapStatusCode::Success;
+        spdlog::error("Failed to receive response for command " + cmd + " because " + error.message());
+        return "";
     }
-    else if(reply.compare("A001 NO LOGIN failed."))
+    
+    ss.str(std::string());
+    ss.clear();
+    std::istream is(&buffer);
+    std::string line;
+    while(std::getline(is, line))
     {
-        return ImapStatusCode::AuthenticationError;
+       ss << line << std::endl; 
     }
-    else
-    {
-        spdlog::error("Unknown server response to login request: " + reply);
-        return ImapStatusCode::InternalError;
-    }
+    
+    std::string response = ss.str();
+    // Pop the last line feed character for better formatting.
+    if(!response.empty()) response.pop_back();
+    spdlog::trace("S: " + response);
+    return response;
 }
-
-std::string  cindel::ImapClient::getReply(boost::system::error_code &error)
-{
-    boost::asio::streambuf buf;
-    boost::asio::read_until(socket, buf, '\n', error);
-    if(error) return std::string();
-
-    std::istream is(&buf);
-    std::string reply;
-    std::getline(is, reply);
-    buf.consume(buf.size());
-    return reply;
-}
-

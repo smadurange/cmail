@@ -9,7 +9,6 @@
 #include <string>
 
 #include "ImapClient.hpp"
-#include "ImapStatusCode.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -24,40 +23,10 @@ int main(int argc, char *argv[])
     
     boost::asio::io_service ioService;
     boost::asio::ssl::context sslContext(boost::asio::ssl::context::sslv23);
-    auto imapClient = cindel::ImapClient(ioService, sslContext);
-
-    try
-    {
-        imapClient.connect(hostname, port);
-    }
-    catch(const std::exception &e)
-    {
-        spdlog::error("IMAP connection error: " + std::string(e.what()) );
-        return -1;
-    }
-
-    try
-    {
-        cindel::ImapStatusCode loginResult = imapClient.login(username, password);
-        switch (loginResult)
-        {
-            case cindel::ImapStatusCode::Success:
-                spdlog::info("Login success!");
-                break;
-            case cindel::ImapStatusCode::AuthenticationError:
-                spdlog::error("Invalid credentials.");
-                break;
-            default:
-                spdlog::error("Login failed with unknown status");
-                break;
-        }
-    }
-    catch(const std::exception &e)
-    {
-        spdlog::error("Login failed with exception: " + std::string(e.what()));
-        return -1;
-    }    
-
+    auto client = cindel::ImapClient(ioService, sslContext);
+    client.connect(hostname, port);
+    client.login(username, password);
+    client.fetch(std::stoi(argv[1]));
     ioService.run();
 
     return 0;
