@@ -56,31 +56,13 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
     spdlog::trace("Server responded to connection request with\n" + response);
 }
 
-cindel::ImapStatusCode cindel::ImapClient::login(const std::string &username, const std::string &password)
+bool cindel::ImapClient::login(const std::string &username, const std::string &password)
 {
     std::string cmd;
     cmd.reserve(username.length() + password.length() + 7);
     cmd.append("LOGIN ").append(username).append(" ").append(password);
     std::string response = execute(cmd);
-
-    if(response.empty())
-    {
-        return ImapStatusCode::ConnectionError;
-    }
-    
-    if(response.compare("A001 OK LOGIN completed."))
-    {
-        return ImapStatusCode::Success;
-    }
-    else if(response.compare("A001 NO LOGIN failed."))
-    {
-        return ImapStatusCode::AuthenticationError;
-    }
-    else
-    {
-        spdlog::error("Unknown server response to login request: " + response);
-        return ImapStatusCode::InternalError;
-    }
+    return response.compare("A001 NO LOGIN failed.");
 }
 
 std::vector<std::string>::iterator cindel::ImapClient::fetch(const int days)

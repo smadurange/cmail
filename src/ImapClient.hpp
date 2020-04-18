@@ -10,8 +10,6 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "ImapStatusCode.hpp"
-
 namespace cindel
 {
     class ImapClient
@@ -20,7 +18,7 @@ namespace cindel
         ImapClient(boost::asio::io_service &ioService, boost::asio::ssl::context &sslContext);
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
-        cindel::ImapStatusCode login(const std::string &username, const std::string &password);
+        bool login(const std::string &username, const std::string &password);
         std::vector<std::string>::iterator fetch(const int days);
 
     private:

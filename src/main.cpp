@@ -9,7 +9,6 @@
 #include <string>
 
 #include "ImapClient.hpp"
-#include "ImapStatusCode.hpp"
 
 int main(int argc, char *argv[])
 {
