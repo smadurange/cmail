@@ -67,7 +67,7 @@ bool cindel::ImapClient::login(const std::string &username, const std::string &p
     return std::regex_search(response, rgx);
 }
 
-std::vector<std::string>::iterator cindel::ImapClient::fetch(const int days)
+std::vector<std::string>::iterator cindel::ImapClient::mailbox(const int days)
 {
     std::string cmd = "SELECT INBOX";
     std::string response = execute(cmd);
@@ -78,6 +78,11 @@ std::vector<std::string>::iterator cindel::ImapClient::fetch(const int days)
     auto t = std::chrono::system_clock::to_time_t(tp);
     ss << "SEARCH SINCE " << std::put_time(std::localtime(&t), "%d-%b-%Y");
     response = execute(ss.str());
+
+    std::string s;
+    s.reserve(100);
+    s = "FETCH 1:3 BODY.PEEK[HEADER.FIELDS (DATE FROM SUBJECT)]";
+    response = execute(s);
     
     return std::vector<std::string>::iterator();
 }

@@ -19,7 +19,7 @@ namespace cindel
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
         bool login(const std::string &username, const std::string &password);
-        std::vector<std::string>::iterator fetch(const int days);
+        std::vector<std::string>::iterator mailbox(const int days);
 
     private:
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
