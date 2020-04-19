@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <istream>
 #include <regex>
+#include <spdlog/common.h>
+#include <spdlog/logger.h>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -80,6 +82,8 @@ std::vector<cmail::Header>::iterator cmail::ImapClient::mailbox(const int days)
     ss << "SEARCH SINCE " << std::put_time(std::localtime(&t), "%d-%b-%Y");
     response = execute(ss.str());
 
+
+
     std::string s;
     s.reserve(100);
     s = "FETCH 1:3 BODY.PEEK[HEADER.FIELDS (DATE FROM SUBJECT)]";
@@ -120,8 +124,13 @@ std::string cmail::ImapClient::execute(const std::string &command)
     }
     
     std::string response = ss.str();
-    // Pop the last line feed character for better formatting.
-    if(!response.empty()) response.pop_back();
-    spdlog::trace("S: " + response);
+
+    if(spdlog::default_logger()->level() == spdlog::level::trace)
+    {
+        std::string s = response;
+        s.pop_back();
+        spdlog::trace("S: " + s);
+    }
+
     return response;
 }
