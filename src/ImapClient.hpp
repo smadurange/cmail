@@ -11,6 +11,8 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/error_code.hpp>
 
+#include "MailSummary.hpp"
+
 namespace cmail
 {
     class ImapClient

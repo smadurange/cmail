@@ -10,6 +10,7 @@ add_executable(cmail
     main.cpp
     ImapClient.hpp
     ImapClient.cpp
+    Header.cpp
 )
 
 find_package(Curses REQUIRED)
