@@ -26,12 +26,12 @@
 namespace ip = boost::asio::ip;
 namespace ssl = boost::asio::ssl;
 
-cindel::ImapClient::ImapClient(boost::asio::io_service &ioService, ssl::context &sslContext)
+cmail::ImapClient::ImapClient(boost::asio::io_service &ioService, ssl::context &sslContext)
     : socket(ioService, sslContext), resolver(ioService)
 {
 }
 
-void cindel::ImapClient::connect(const std::string &hostname, const std::string &port)
+void cmail::ImapClient::connect(const std::string &hostname, const std::string &port)
 {
     boost::system::error_code error;
     ip::tcp::resolver::iterator endpoints = resolver.resolve(hostname, port, error);
@@ -57,7 +57,7 @@ void cindel::ImapClient::connect(const std::string &hostname, const std::string 
     spdlog::trace("Server responded to connection request with\n" + response);
 }
 
-bool cindel::ImapClient::login(const std::string &username, const std::string &password)
+bool cmail::ImapClient::login(const std::string &username, const std::string &password)
 {
     std::string cmd;
     cmd.reserve(username.length() + password.length() + 7);
@@ -67,7 +67,7 @@ bool cindel::ImapClient::login(const std::string &username, const std::string &p
     return std::regex_search(response, rgx);
 }
 
-std::vector<std::string>::iterator cindel::ImapClient::mailbox(const int days)
+std::vector<std::string>::iterator cmail::ImapClient::mailbox(const int days)
 {
     std::string cmd = "SELECT INBOX";
     std::string response = execute(cmd);
@@ -87,7 +87,7 @@ std::vector<std::string>::iterator cindel::ImapClient::mailbox(const int days)
     return std::vector<std::string>::iterator();
 }
 
-std::string cindel::ImapClient::execute(const std::string &command)
+std::string cmail::ImapClient::execute(const std::string &command)
 {
     std::stringstream ss;
     ss << ++commandCounter << " " << command;

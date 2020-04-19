@@ -1,4 +1,5 @@
 #pragma once
+
 #include <atomic>
 #include <string>
 #include <vector>
@@ -10,7 +11,7 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/error_code.hpp>
 
-namespace cindel
+namespace cmail
 {
     class ImapClient
     {

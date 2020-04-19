@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     
     boost::asio::io_service ioService;
     boost::asio::ssl::context sslContext(boost::asio::ssl::context::sslv23);
-    auto client = cindel::ImapClient(ioService, sslContext);
+    auto client = cmail::ImapClient(ioService, sslContext);
     client.connect(hostname, port);
     client.login(username, password);
     client.mailbox(std::stoi(argv[1]));
