@@ -11,7 +11,7 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/error_code.hpp>
 
-#include "MailSummary.hpp"
+#include "Header.hpp"
 
 namespace cmail
 {
@@ -22,7 +22,7 @@ namespace cmail
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
         bool login(const std::string &username, const std::string &password);
-        std::vector<std::string>::iterator mailbox(const int days);
+        std::vector<cmail::Header>::iterator mailbox(const int days);
 
     private:
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;

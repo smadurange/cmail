@@ -21,6 +21,7 @@
 
 #include <spdlog/spdlog.h>
 
+#include "Header.hpp"
 #include "ImapClient.hpp"
 
 namespace ip = boost::asio::ip;
@@ -67,11 +68,11 @@ bool cmail::ImapClient::login(const std::string &username, const std::string &pa
     return std::regex_search(response, rgx);
 }
 
-std::vector<std::string>::iterator cmail::ImapClient::mailbox(const int days)
+std::vector<cmail::Header>::iterator cmail::ImapClient::mailbox(const int days)
 {
     std::string cmd = "SELECT INBOX";
     std::string response = execute(cmd);
-    if(response.empty()) return std::vector<std::string>::iterator();
+    if(response.empty()) return std::vector<cmail::Header>::iterator();
    
     std::stringstream ss;
     auto tp = std::chrono::system_clock::now() - std::chrono::hours(days * 24);
@@ -84,7 +85,7 @@ std::vector<std::string>::iterator cmail::ImapClient::mailbox(const int days)
     s = "FETCH 1:3 BODY.PEEK[HEADER.FIELDS (DATE FROM SUBJECT)]";
     response = execute(s);
     
-    return std::vector<std::string>::iterator();
+    return std::vector<cmail::Header>::iterator();
 }
 
 std::string cmail::ImapClient::execute(const std::string &command)
