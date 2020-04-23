@@ -42,18 +42,23 @@ void cmail::ImapClient::connect(const std::string &hostname, const std::string &
     
     spdlog::trace("Sending connection request to server.");
     ip::tcp::resolver::iterator it = boost::asio::connect(socket.lowest_layer(), endpoints, error);
-    if(error) throw std::runtime_error("Failed to connect to IMAP server: " + error.message());
+    if(error)
+        throw std::runtime_error("Failed to connect to IMAP server: " + error.message());
+
     ip::tcp::endpoint endpoint = *it;
     spdlog::debug("Connected to IMAP server: " + endpoint.address().to_string());
 
     socket.set_verify_mode(ssl::verify_none);
     spdlog::warn("SSL certificate validation is set to verify_none.");
     socket.handshake(ssl::stream<ip::tcp::socket>::client, error);
-    if(error) throw std::runtime_error("SSL handshake failed: " + error.message());
+    if(error)
+        throw std::runtime_error("SSL handshake failed: " + error.message());
 
     boost::asio::streambuf buffer;
     boost::asio::read_until(socket, buffer, '\n', error);
-    if(error) throw std::runtime_error("Failed to get a response from server: " + error.message());
+    if(error)
+        throw std::runtime_error("Failed to get a response from server: " + error.message());
+    
     std::istream is(&buffer);
     std::string response;
     std::getline(is, response);
@@ -74,21 +79,23 @@ std::vector<cmail::Header>::iterator cmail::ImapClient::mailbox(const int days)
 {
     std::string cmd = "SELECT INBOX";
     std::string response = execute(cmd);
-    if(response.empty()) return std::vector<cmail::Header>::iterator();
+    if(response.empty())
+        return std::vector<cmail::Header>::iterator();
    
-    std::stringstream ss;
+    std::ostringstream ss;
     auto tp = std::chrono::system_clock::now() - std::chrono::hours(days * 24);
     auto t = std::chrono::system_clock::to_time_t(tp);
     ss << "SEARCH SINCE " << std::put_time(std::localtime(&t), "%d-%b-%Y");
     response = execute(ss.str());
-
-
-
-    std::string s;
-    s.reserve(100);
-    s = "FETCH 1:3 BODY.PEEK[HEADER.FIELDS (DATE FROM SUBJECT)]";
-    response = execute(s);
     
+    std::smatch sm;
+    std::regex rgx("\\d");
+    if(!std::regex_search(response, sm, rgx))
+        return std::vector<cmail::Header>::iterator();
+    
+    std::ostringstream os;
+    os << "FETCH " << sm[0] << ":*" << " BODY.PEEK[HEADER.FIELDS (DATE FROM SUBJECT)]";
+    response = execute(os.str());
     return std::vector<cmail::Header>::iterator();
 }
 
