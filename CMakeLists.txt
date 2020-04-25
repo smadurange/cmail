@@ -7,10 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
 add_executable(cmail 
-    main.cpp
-    ImapClient.hpp
-    ImapClient.cpp
-    Email.hpp
+    src/main.cpp
+    src/ImapClient.hpp
+    src/ImapClient.cpp
+    src/Email.hpp
 )
 
 find_package(Curses REQUIRED)
