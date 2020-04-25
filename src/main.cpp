@@ -1,4 +1,5 @@
 #include <exception>
+#include <vector>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -8,6 +9,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <string>
 
+#include "Email.hpp"
 #include "ImapClient.hpp"
 
 int main(int argc, char *argv[])
@@ -26,7 +28,7 @@ int main(int argc, char *argv[])
     auto client = cmail::ImapClient(ioService, sslContext);
     client.connect(hostname, port);
     client.login(username, password);
-    client.mailbox(std::stoi(argv[1]));
+    std::vector<cmail::Email> mailbox = client.fetchMailbox(std::stoi(argv[1]));
     ioService.run();
 
     return 0;

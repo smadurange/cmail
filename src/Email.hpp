@@ -4,8 +4,9 @@
 
 namespace cmail
 {
-    struct Header
+    struct Email
     {
+        int Id;
         std::string Subject;
         std::string From;
         std::string Date;

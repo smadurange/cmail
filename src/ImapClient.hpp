@@ -13,7 +13,7 @@
 
 namespace cmail
 {
-    struct Header;
+    struct Email;
 
     class ImapClient
     {
@@ -22,12 +22,12 @@ namespace cmail
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
         bool login(const std::string &username, const std::string &password);
-        std::vector<cmail::Header>::iterator mailbox(const int days);
+        std::vector<cmail::Email> fetchMailbox(const int days);
 
     private:
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
         boost::asio::ip::tcp::resolver resolver;
-        std::atomic<int> commandCounter{0}; 
+        std::atomic<int> commandCounter{0};
 
         std::string execute(const std::string &command);
     };

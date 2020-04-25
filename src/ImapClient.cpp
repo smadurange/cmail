@@ -23,7 +23,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "Header.hpp"
+#include "Email.hpp"
 #include "ImapClient.hpp"
 
 namespace ip = boost::asio::ip;
@@ -75,12 +75,14 @@ bool cmail::ImapClient::login(const std::string &username, const std::string &pa
     return std::regex_search(response, rgx);
 }
 
-std::vector<cmail::Header>::iterator cmail::ImapClient::mailbox(const int days)
+std::vector<cmail::Email> cmail::ImapClient::fetchMailbox(const int days)
 {
+    auto mailbox = std::vector<cmail::Email>();
+
     std::string cmd = "SELECT INBOX";
     std::string response = execute(cmd);
     if(response.empty())
-        return std::vector<cmail::Header>::iterator();
+        return mailbox;
    
     std::ostringstream ss;
     auto tp = std::chrono::system_clock::now() - std::chrono::hours(days * 24);
@@ -89,14 +91,43 @@ std::vector<cmail::Header>::iterator cmail::ImapClient::mailbox(const int days)
     response = execute(ss.str());
     
     std::smatch sm;
-    std::regex rgx("\\d");
-    if(!std::regex_search(response, sm, rgx))
-        return std::vector<cmail::Header>::iterator();
+    if(!std::regex_search(response, sm, std::regex("\\d")))
+        return mailbox;
     
     std::ostringstream os;
     os << "FETCH " << sm[0] << ":*" << " BODY.PEEK[HEADER.FIELDS (DATE FROM SUBJECT)]";
     response = execute(os.str());
-    return std::vector<cmail::Header>::iterator();
+    if(response.empty())
+        return mailbox;
+    
+    std::istringstream is;
+    is >> response;
+    std::string line;
+    while(std::getline(is, line))
+    {
+        std::smatch match;
+        if(std::regex_search(line, match, std::regex("*")))
+        {
+            cmail::Email header;
+            header.Id = std::stoi(match[0]);
+            while(std::getline(is, line))
+            {
+                if(std::regex_search(line, match, std::regex("(From: )(.*)")))
+                    header.From = match[2];
+                else if(std::regex_search(line, match, std::regex("(Subject: )(.*)")))
+                    header.Subject = match[2];
+                else if(std::regex_search(line, match, std::regex("(Date: )(.*)")))
+                {
+                    header.Date = match[2];
+                    break;
+                }
+            }
+
+            mailbox.push_back(header);
+        }
+    }
+
+    return mailbox;
 }
 
 std::string cmail::ImapClient::execute(const std::string &command)
