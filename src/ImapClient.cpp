@@ -38,7 +38,8 @@ void cmail::ImapClient::connect(const std::string &hostname, const std::string &
 {
     boost::system::error_code error;
     ip::tcp::resolver::iterator endpoints = resolver.resolve(hostname, port, error);
-    if(error) throw std::runtime_error("Failed to resolve hostname: " + error.message());
+    if(error)
+        throw std::runtime_error("Failed to resolve hostname: " + error.message());
     
     spdlog::trace("Sending connection request to server.");
     ip::tcp::resolver::iterator it = boost::asio::connect(socket.lowest_layer(), endpoints, error);
