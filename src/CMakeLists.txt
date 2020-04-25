@@ -1,30 +1,30 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(Cindel LANGUAGES CXX)
+project(Cmail LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 
-add_executable(cindel 
+add_executable(cmail 
     main.cpp
     ImapClient.hpp
     ImapClient.cpp
-    ImapStatusCode.hpp
+    Email.hpp
 )
 
 find_package(Curses REQUIRED)
-include_directories(cindel ${CURSES_INCLUDE_DIRS})
-target_link_libraries(cindel ${CURSES_LIBRARIES})
+include_directories(cmail ${CURSES_INCLUDE_DIRS})
+target_link_libraries(cmail ${CURSES_LIBRARIES})
 
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIRS})
-target_link_libraries(cindel ${OPENSSL_LIBRARIES})
+target_link_libraries(cmail ${OPENSSL_LIBRARIES})
 
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries(cindel ${BOOST_LIBRARIES})
+target_link_libraries(cmail ${BOOST_LIBRARIES})
 
 find_package(spdlog REQUIRED)
-target_link_libraries(cindel spdlog::spdlog)
+target_link_libraries(cmail spdlog::spdlog)

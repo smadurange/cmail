@@ -1,4 +1,6 @@
 #include <exception>
+#include <iostream>
+#include <vector>
 
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
@@ -8,6 +10,7 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <string>
 
+#include "Email.hpp"
 #include "ImapClient.hpp"
 
 int main(int argc, char *argv[])
@@ -23,10 +26,16 @@ int main(int argc, char *argv[])
     
     boost::asio::io_service ioService;
     boost::asio::ssl::context sslContext(boost::asio::ssl::context::sslv23);
-    auto client = cindel::ImapClient(ioService, sslContext);
+    auto client = cmail::ImapClient(ioService, sslContext);
     client.connect(hostname, port);
     client.login(username, password);
-    client.fetch(std::stoi(argv[1]));
+    std::vector<cmail::Email> mailbox = client.fetchMailbox(std::stoi(argv[1]));
+    for(auto it = mailbox.begin(); it != mailbox.end(); ++it)
+    {
+        auto email = *it;
+        std::cout << email.Id << ": " << email.Subject << std::endl;
+    }
+
     ioService.run();
 
     return 0;

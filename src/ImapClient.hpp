@@ -1,4 +1,5 @@
 #pragma once
+
 #include <atomic>
 #include <string>
 #include <vector>
@@ -10,8 +11,10 @@
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/error_code.hpp>
 
-namespace cindel
+namespace cmail
 {
+    struct Email;
+
     class ImapClient
     {
     public:
@@ -19,12 +22,12 @@ namespace cindel
         ~ImapClient() = default;
         void connect(const std::string &hostname, const std::string &port);
         bool login(const std::string &username, const std::string &password);
-        std::vector<std::string>::iterator fetch(const int days);
+        std::vector<cmail::Email> fetchMailbox(const int days);
 
     private:
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
         boost::asio::ip::tcp::resolver resolver;
-        std::atomic<int> commandCounter{0}; 
+        std::atomic<int> commandCounter{0};
 
         std::string execute(const std::string &command);
     };

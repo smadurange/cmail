@@ -1,11 +1,14 @@
 #pragma once
+
 #include <string>
 
-namespace cindel
+namespace cmail
 {
     struct Email
     {
-        std::string subject;
-        std::string body;
+        int Id;
+        std::string Subject;
+        std::string From;
+        std::string Date;
     };
 }
