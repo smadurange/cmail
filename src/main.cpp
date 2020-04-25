@@ -32,7 +32,8 @@ int main(int argc, char *argv[])
     std::vector<cmail::Email> mailbox = client.fetchMailbox(std::stoi(argv[1]));
     for(auto it = mailbox.begin(); it != mailbox.end(); ++it)
     {
-        std::cout << (*it).Subject << std::endl;
+        auto email = *it;
+        std::cout << email.Id << ": " << email.Subject << std::endl;
     }
 
     ioService.run();
