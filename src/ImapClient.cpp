@@ -96,7 +96,7 @@ std::vector<cmail::Email> cmail::ImapClient::fetchMailbox(const int days)
         return mailbox;
     
     std::ostringstream os;
-    os << "FETCH " << sm[0] << ":*" << " BODY.PEEK[HEADER.FIELDS (DATE FROM SUBJECT)]";
+    os << "FETCH " << sm[0] << ":*" << " (BODY.PEEK[HEADER.FIELDS (DATE FROM SUBJECT)] FLAGS)";
     response = execute(os.str());
     if(response.empty())
         return mailbox;
@@ -119,6 +119,10 @@ std::vector<cmail::Email> cmail::ImapClient::fetchMailbox(const int days)
                 else if(std::regex_search(line, match, std::regex("(Date: )(.*)")))
                 {
                     header.Date = match[2];
+                }
+                else if(std::regex_search(line, std::regex("^ FLAGS")))
+                {
+                    header.Seen = std::regex_search(line, std::regex("\\\\Seen")) ? true : false;
                     break;
                 }
             }
