@@ -1,4 +1,5 @@
 #include <exception>
+#include <iostream>
 #include <vector>
 
 #include <boost/asio.hpp>
@@ -29,6 +30,11 @@ int main(int argc, char *argv[])
     client.connect(hostname, port);
     client.login(username, password);
     std::vector<cmail::Email> mailbox = client.fetchMailbox(std::stoi(argv[1]));
+    for(auto it = mailbox.begin(); it != mailbox.end(); ++it)
+    {
+        std::cout << (*it).Subject << std::endl;
+    }
+
     ioService.run();
 
     return 0;

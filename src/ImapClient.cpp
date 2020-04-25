@@ -101,16 +101,15 @@ std::vector<cmail::Email> cmail::ImapClient::fetchMailbox(const int days)
     if(response.empty())
         return mailbox;
     
-    std::istringstream is;
-    is >> response;
+    std::istringstream is(response);
     std::string line;
     while(std::getline(is, line))
     {
         std::smatch match;
-        if(std::regex_search(line, match, std::regex("*")))
+        if(std::regex_search(line, match, std::regex("(\\* )(\\d)")))
         {
             cmail::Email header;
-            header.Id = std::stoi(match[0]);
+            header.Id = std::stoi(match[2]);
             while(std::getline(is, line))
             {
                 if(std::regex_search(line, match, std::regex("(From: )(.*)")))
