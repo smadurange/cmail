@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     for(auto it = mailbox.begin(); it != mailbox.end(); ++it)
     {
         auto email = *it;
-        std::cout << email.Id << ": " << email.Subject << std::endl;
+        std::cout << email.Id << ": " << email.Subject << " - " << (email.Seen ? "READ" : "UNREAD") << std::endl;
     }
 
     ioService.run();

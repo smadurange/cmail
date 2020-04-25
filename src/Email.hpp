@@ -10,5 +10,6 @@ namespace cmail
         std::string Subject;
         std::string From;
         std::string Date;
+        bool Seen{false};
     };
 }
