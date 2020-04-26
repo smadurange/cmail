@@ -1,0 +1,6 @@
+{
+   "host": "outlook.office365.com",
+   "port": 993,
+   "username": "example@outlook.com",
+   "password": "password" 
+}

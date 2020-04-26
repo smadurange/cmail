@@ -23,5 +23,8 @@ target_link_libraries(cmail ${OPENSSL_LIBRARIES})
 find_package(spdlog REQUIRED)
 target_link_libraries(cmail spdlog::spdlog)
 
+find_package(RapidJSON CONFIG REQUIRED)
+include_directories(cmail ${RAPIDJSON_INCLUDE_DIRS})
+
 include_directories(cmail "${CMAKE_SOURCE_DIR}/lib/mailio/0.18.0/arch_x64")
 target_link_libraries(cmail "${CMAKE_CURRENT_SOURCE_DIR}/lib/mailio/0.18.0/arch_x64/libmailio.so")
