@@ -1,17 +1,12 @@
-#include <exception>
 #include <iostream>
-#include <vector>
+#include <list>
+#include <string>
 
-#include <boost/asio.hpp>
-#include <boost/asio/ssl.hpp>
+#include <mailio/imap.hpp>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <string>
-
-#include "Email.hpp"
-#include "ImapClient.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -19,24 +14,16 @@ int main(int argc, char *argv[])
     spdlog::set_default_logger(console);
     spdlog::set_level(spdlog::level::trace);
 
-    const std::string hostname = "outlook.office365.com";
-    const std::string port = "993";
+    const std::string host = "outlook.office365.com";
+    int port = 993;
     const std::string username = "test.20200410@outlook.com";
     const std::string password = "MN3SbbTVYviMi55F";
-    
-    boost::asio::io_service ioService;
-    boost::asio::ssl::context sslContext(boost::asio::ssl::context::sslv23);
-    auto client = cmail::ImapClient(ioService, sslContext);
-    client.connect(hostname, port);
-    client.login(username, password);
-    std::vector<cmail::Email> mailbox = client.fetchMailbox(std::stoi(argv[1]));
-    for(auto it = mailbox.begin(); it != mailbox.end(); ++it)
-    {
-        auto email = *it;
-        std::cout << email.Id << ": " << email.Subject << " - " << (email.Seen ? "READ" : "UNREAD") << std::endl;
-    }
 
-    ioService.run();
+    mailio::imaps conn(host, port);
+    conn.authenticate(username, password, mailio::imaps::auth_method_t::LOGIN);
+
+    mailio::imaps::mailbox_stat_t stat = conn.statistics("inbox");
+    std::cout << "Number of messages in mailbox: " << stat.messages_no << std::endl;
 
     return 0;
 }
