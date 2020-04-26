@@ -1,3 +1,4 @@
+#include <exception>
 #include <mutex>
 #include <string>
 
@@ -59,8 +60,7 @@ cmail::Response cmail::Connection::open(const std::string &host, int port)
     {
         std::string err = "SSL handshake failed: " + error.message();
         spdlog::error(err);
-        socket.shutdown();
-        socket.close();
+        cmail::Connection::close();
         return response("", err, false);
     }
     
@@ -68,4 +68,21 @@ cmail::Response cmail::Connection::open(const std::string &host, int port)
     connected = true;
     spdlog::info("Connected to IMAP server: " + it->address().to_string());
     return 
+}
+
+cmail::Response cmail::Connection::close()
+{
+    cmail::Response res;
+    try
+    {
+        socket.shutdown();
+        socket.close();
+        return res("", "", true);
+    }
+    catch (std::exception &e)
+    {
+        std::string err = "Failed to close connection: " + e.what();
+        spdlog::error(err);
+        return res("", err, false);
+    }
 }
