@@ -13,6 +13,9 @@ add_executable(cmail
     src/Email.hpp
 )
 
+include_directories(cmail "${CMAKE_SOURCE_DIR}/lib/include")
+target_link_libraries(cmail "${CMAKE_CURRENT_SOURCE_DIR}/lib/mailio/0.18.0/arch_x64/libmailio.a")
+
 find_package(Curses REQUIRED)
 include_directories(cmail ${CURSES_INCLUDE_DIRS})
 target_link_libraries(cmail ${CURSES_LIBRARIES})
@@ -28,3 +31,5 @@ target_link_libraries(cmail ${BOOST_LIBRARIES})
 
 find_package(spdlog REQUIRED)
 target_link_libraries(cmail spdlog::spdlog)
+
+

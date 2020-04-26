@@ -1,17 +1,13 @@
 #include <exception>
 #include <iostream>
+#include <string>
 #include <vector>
 
-#include <boost/asio.hpp>
-#include <boost/asio/ssl.hpp>
+#include <mailio/imap.hpp>
 
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <string>
-
-#include "Email.hpp"
-#include "ImapClient.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -24,19 +20,5 @@ int main(int argc, char *argv[])
     const std::string username = "test.20200410@outlook.com";
     const std::string password = "MN3SbbTVYviMi55F";
     
-    boost::asio::io_service ioService;
-    boost::asio::ssl::context sslContext(boost::asio::ssl::context::sslv23);
-    auto client = cmail::ImapClient(ioService, sslContext);
-    client.connect(hostname, port);
-    client.login(username, password);
-    std::vector<cmail::Email> mailbox = client.fetchMailbox(std::stoi(argv[1]));
-    for(auto it = mailbox.begin(); it != mailbox.end(); ++it)
-    {
-        auto email = *it;
-        std::cout << email.Id << ": " << email.Subject << " - " << (email.Seen ? "READ" : "UNREAD") << std::endl;
-    }
-
-    ioService.run();
-
     return 0;
 }
