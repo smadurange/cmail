@@ -1,6 +1,5 @@
 #include <iostream>
 #include <list>
-#include <rapidjson/encodings.h>
 #include <string>
 
 #include <mailio/imap.hpp>
@@ -8,6 +7,7 @@
 #include <ncurses.h>
 
 #include <rapidjson/document.h>
+#include <rapidjson/encodings.h>
 #include <rapidjson/filereadstream.h>
 
 #include <spdlog/common.h>
