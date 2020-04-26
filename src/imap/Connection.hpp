@@ -1,6 +1,8 @@
 #pragma once
 
 #include <atomic>
+#include <boost/asio/io_context.hpp>
+#include <boost/asio/ssl/context.hpp>
 #include <mutex>
 
 #include <boost/asio.hpp>
@@ -17,14 +19,16 @@ namespace cmail
         Connection(Connection const&) = delete;
         Connection &operator=(Connection const&) = delete;
         ~Connection() = default;
-        void open(std::string host, int port);
+        void open(const std::string &host, int port);
         void close();
         Response send(const std::string &request);
 
     private:
-        bool connected;
+        bool connected{false};
         std::mutex mtx;
         std::atomic<int> counter{0};
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
+
+        Connection(boost::asio::io_context &ctx, boost::asio::ssl::context &ssl);
     };
 }
