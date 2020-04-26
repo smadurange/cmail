@@ -1,5 +1,4 @@
 #include <mutex>
-#include <openssl/asn1.h>
 #include <string>
 
 #include <boost/asio/io_context.hpp>
@@ -7,7 +6,6 @@
 #include <boost/system/error_code.hpp>
 
 #include <spdlog/spdlog.h>
-#include <sys/socket.h>
 
 #include "Connection.hpp"
 #include "Response.hpp"
