@@ -1,3 +1,4 @@
+#include <boost/asio/detail/memory.hpp>
 #include <boost/asio/ssl/verify_mode.hpp>
 #include <exception>
 #include <mutex>
@@ -63,7 +64,7 @@ Response Connection::open(const string &host, int port)
         return res;
     }
     
-    spdlog::trace("Resolved endpoints for " + host);
+    spdlog::trace("Resolved endpoints for %s", host);
     spdlog::trace("Sending connection request to server.");
     tcp::resolver::iterator it = connect(socket.lowest_layer(), endpoints, error);
     if(error)
@@ -90,7 +91,7 @@ Response Connection::open(const string &host, int port)
     spdlog::trace("SSL handshake completed.");
     connected = true;
     tcp::endpoint ep = *it;
-    spdlog::info("Connected to IMAP server: " + ep.address().to_string());
+    spdlog::info("Connected to IMAP server: %s", ep.address().to_string());
     res.success = true;
     return res;
 }
