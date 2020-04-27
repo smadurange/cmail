@@ -77,6 +77,7 @@ cmail::Response cmail::Connection::close()
     {
         socket.shutdown();
         socket.close();
+        spdlog::info("Connection to IMAP server closed.");
         return res("", "", true);
     }
     catch (std::exception &e)
