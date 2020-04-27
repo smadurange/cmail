@@ -13,13 +13,23 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 #include "imap/Connection.hpp"
+#include "imap/Response.hpp"
 
-rapidjson::Document initConfig()
+using std::FILE;
+using std::fopen;
+
+using cmail::imap::Connection;
+using cmail::imap::Response;
+
+using rapidjson::Document;
+using rapidjson::FileReadStream;
+
+Document initConfig()
 {
-    std::FILE *fp = std::fopen("config.json", "r");
+    FILE *fp = fopen("config.json", "r");
     char buf[65536];
-    rapidjson::FileReadStream fs(fp, buf, sizeof(buf));
-    rapidjson::Document doc;
+    FileReadStream fs(fp, buf, sizeof(buf));
+    Document doc;
     doc.ParseStream(fs);
     fclose(fp);
     return doc;
@@ -27,7 +37,7 @@ rapidjson::Document initConfig()
 
 int main(int argc, char *argv[])
 {
-    rapidjson::Document config = initConfig();
+    auto config = initConfig();
 
     auto console = spdlog::stdout_color_mt("console");  
     spdlog::set_default_logger(console);
@@ -38,13 +48,13 @@ int main(int argc, char *argv[])
     // noecho();
     // keypad(stdscr, true);
     
-    std::string host = config["host"].GetString();
-    int port = config["port"].GetInt();
-    std::string username = config["username"].GetString();
-    std::string password = config["password"].GetString();
+    auto host = config["host"].GetString();
+    auto port = config["port"].GetInt();
+    auto username = config["username"].GetString();
+    auto password = config["password"].GetString();
     
-    cmail::Connection &conn = cmail::Connection::instance();
-    cmail::Response res = conn.open(host, port);
+    auto &conn = Connection::instance();
+    auto res = conn.open(host, port);
 
     // printw("Number of messages in mailbox: %d",stat.messages_no);
 

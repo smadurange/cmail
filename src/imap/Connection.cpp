@@ -25,12 +25,15 @@ using boost::asio::ssl::stream;
 using boost::asio::ssl::verify_none;
 using boost::system::error_code;
 
-cmail::Connection::Connection(io_context &ctx, context &ssl)
+using cmail::imap::Connection;
+using cmail::imap::Response;
+
+Connection::Connection(io_context &ctx, context &ssl)
     : resolver(ctx), socket(ctx, ssl)
 {
 }
 
-cmail::Connection &cmail::Connection::instance()
+Connection &Connection::instance()
 {
     io_context ctx;
     context ssl(context::sslv23);
@@ -38,10 +41,10 @@ cmail::Connection &cmail::Connection::instance()
     return conn;
 }
 
-cmail::Response cmail::Connection::open(const string &host, int port)
+Response Connection::open(const string &host, int port)
 {
     lock_guard<mutex> lock(mtx);
-    cmail::Response res;
+    Response res;
     if(connected)
     {
         res.success = true;
@@ -79,7 +82,7 @@ cmail::Response cmail::Connection::open(const string &host, int port)
     {
         string err = string("SSL handshake failed: ") + error.message();
         spdlog::error(err);
-        cmail::Connection::close();
+        Connection::close();
         res.content = err;
         return res;
     }
@@ -92,9 +95,9 @@ cmail::Response cmail::Connection::open(const string &host, int port)
     return res;
 }
 
-cmail::Response cmail::Connection::close()
+Response Connection::close()
 {
-    cmail::Response res;
+    Response res;
     try
     {
         socket.lowest_layer().cancel();

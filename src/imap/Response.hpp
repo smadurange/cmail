@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace cmail
+namespace cmail::imap
 {
     struct Response
     {

@@ -10,7 +10,7 @@
 
 #include "Response.hpp"
 
-namespace cmail
+namespace cmail::imap
 {
     class Connection
     {
