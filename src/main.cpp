@@ -3,9 +3,7 @@
 #include <rapidjson/encodings.h>
 #include <string>
 
-#include <mailio/imap.hpp>
-
-#include <ncurses.h>
+//#include <ncurses.h>
 
 #include <rapidjson/document.h>
 #include <rapidjson/filereadstream.h>
@@ -13,6 +11,8 @@
 #include <spdlog/common.h>
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+
+#include "imap/Connection.hpp"
 
 rapidjson::Document initConfig()
 {
@@ -33,24 +33,23 @@ int main(int argc, char *argv[])
     spdlog::set_default_logger(console);
     spdlog::set_level(spdlog::level::trace);
 
-    initscr();
-    raw();
-    noecho();
-    keypad(stdscr, true);
+    // initscr();
+    // raw();
+    // noecho();
+    // keypad(stdscr, true);
     
     std::string host = config["host"].GetString();
     int port = config["port"].GetInt();
     std::string username = config["username"].GetString();
     std::string password = config["password"].GetString();
+    
+    cmail::Connection &conn = cmail::Connection::instance();
+    cmail::Response res = conn.open(host, port);
 
-    mailio::imaps conn(host, port);
-    conn.authenticate(username, password, mailio::imaps::auth_method_t::LOGIN);
+    // printw("Number of messages in mailbox: %d",stat.messages_no);
 
-    mailio::imaps::mailbox_stat_t stat = conn.statistics("inbox");
-    printw("Number of messages in mailbox: %d",stat.messages_no);
-
-    getch();
-    endwin();
+    // getch();
+    // endwin();
 
     return 0;
 }

@@ -8,10 +8,10 @@
 #include <boost/asio.hpp>
 #include <boost/asio/ssl.hpp>
 
+#include "Response.hpp"
+
 namespace cmail
 {
-    struct Response;
-
     class Connection
     {
     public:

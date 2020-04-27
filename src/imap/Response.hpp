@@ -6,8 +6,8 @@ namespace cmail
 {
     struct Response
     {
-        std::string tag;
-        std::string content;
-        bool success; 
+        std::string tag{std::string()};
+        std::string content{std::string()};
+        bool success{false}; 
     };
 }
