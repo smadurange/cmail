@@ -12,6 +12,11 @@
 #include "Connection.hpp"
 #include "Response.hpp"
 
+using std::lock_guard;
+using std::mutex;
+using std::string;
+using std::to_string;
+
 using boost::asio::connect;
 using boost::asio::io_context;
 using boost::asio::ip::tcp;
@@ -19,11 +24,6 @@ using boost::asio::ssl::context;
 using boost::asio::ssl::stream;
 using boost::asio::ssl::verify_none;
 using boost::system::error_code;
-
-using std::lock_guard;
-using std::mutex;
-using std::string;
-using std::to_string;
 
 cmail::Connection::Connection(io_context &ctx, context &ssl)
     : resolver(ctx), socket(ctx, ssl)
