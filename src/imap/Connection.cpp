@@ -12,12 +12,18 @@
 #include "Connection.hpp"
 #include "Response.hpp"
 
+using boost::asio::connect;
 using boost::asio::io_context;
 using boost::asio::ip::tcp;
 using boost::asio::ssl::context;
 using boost::asio::ssl::stream;
 using boost::asio::ssl::verify_none;
 using boost::system::error_code;
+
+using std::lock_guard;
+using std::mutex;
+using std::string;
+using std::to_string;
 
 cmail::Connection::Connection(io_context &ctx, context &ssl)
     : resolver(ctx), socket(ctx, ssl)
@@ -32,9 +38,9 @@ cmail::Connection &cmail::Connection::instance()
     return conn;
 }
 
-cmail::Response cmail::Connection::open(const std::string &host, int port)
+cmail::Response cmail::Connection::open(const string &host, int port)
 {
-    std::lock_guard<std::mutex> lock(mtx);
+    lock_guard<mutex> lock(mtx);
     cmail::Response res;
     if(connected)
     {
@@ -43,12 +49,12 @@ cmail::Response cmail::Connection::open(const std::string &host, int port)
     }
 
     error_code error;
-    tcp::resolver::query query(host, std::to_string(port));
+    tcp::resolver::query query(host, to_string(port));
     spdlog::trace("Attempting to resolve endpoint.");
     tcp::resolver::iterator endpoints = resolver.resolve(query, error);
     if(error)
     {
-        std::string err = std::string("Failed to resolve hostname: ") + error.message();
+        string err = string("Failed to resolve hostname: ") + error.message();
         spdlog::error(err);
         res.content = err;
         return res;
@@ -56,10 +62,10 @@ cmail::Response cmail::Connection::open(const std::string &host, int port)
     
     spdlog::trace("Resolved endpoints for " + host);
     spdlog::trace("Sending connection request to server.");
-    tcp::resolver::iterator it = boost::asio::connect(socket.lowest_layer(), endpoints, error);
+    tcp::resolver::iterator it = connect(socket.lowest_layer(), endpoints, error);
     if(error)
     {
-        std::string err = std::string("Failed to connect to IMAP server: ") + error.message();
+        string err = string("Failed to connect to IMAP server: ") + error.message();
         spdlog::error(err);
         res.content = err;
         return res;
@@ -71,7 +77,7 @@ cmail::Response cmail::Connection::open(const std::string &host, int port)
     socket.handshake(stream<tcp::socket>::client, error);
     if(error)
     {
-        std::string err = std::string("SSL handshake failed: ") + error.message();
+        string err = string("SSL handshake failed: ") + error.message();
         spdlog::error(err);
         cmail::Connection::close();
         res.content = err;
@@ -99,7 +105,7 @@ cmail::Response cmail::Connection::close()
     }
     catch (std::exception &e)
     {
-        std::string err = std::string("Failed to close connection: ") + e.what();
+        string err = string("Failed to close connection: ") + e.what();
         spdlog::error(err);
         res.content = err;
         return res;
