@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     auto password = config["password"].GetString();
     
     connection conn;
+    conn.open(host, port);
     // printw("Number of messages in mailbox: %d",stat.messages_no);
 
     // getch();
