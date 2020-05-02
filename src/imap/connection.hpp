@@ -13,7 +13,7 @@ namespace cmail::imap
     {
     public:
         explicit connection();
-        ~connection() = default;
+        ~connection();
 
         connection(connection const&) = delete;
         connection& operator=(connection const&) = delete;
