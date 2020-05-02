@@ -1,7 +1,6 @@
 add_library(imaplib
-    Connection.hpp
-    Connection.cpp
-    Response.hpp
+    connection.hpp
+    connection.cpp
 )
 
 target_include_directories(imaplib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
