@@ -34,7 +34,7 @@ cmail::imap::connection::~connection()
 {
     const lock_guard<mutex> lock(mtx_soc);
     soc.lowest_layer().cancel();
-    soc.shutdown();
+    soc.lowest_layer().close();
     spdlog::info("IMAP connection closed.");
 }
 
