@@ -12,8 +12,6 @@ add_executable(cmail
     main.cpp
 )
 
-target_include_directories(cmail PUBLIC "${CMAKE_SOURCE_DIR}/lib/include")
-
 target_link_libraries(cmail imaplib)
 
 find_package(spdlog REQUIRED)
