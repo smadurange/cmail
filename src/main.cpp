@@ -12,12 +12,12 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-#include "imap/connection.hpp"
+#include "imap/Connection.hpp"
 
 using std::FILE;
 using std::fopen;
 
-using cmail::imap::connection;
+using cmail::imap::Connection;
 
 using rapidjson::Document;
 using rapidjson::FileReadStream;
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     auto username = config["username"].GetString();
     auto password = config["password"].GetString();
     
-    connection conn;
+    Connection conn;
     conn.open(host, port);
     // printw("Number of messages in mailbox: %d",stat.messages_no);
 

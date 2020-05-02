@@ -6,7 +6,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "connection.hpp"
+#include "Connection.hpp"
 
 using std::lock_guard;
 using std::mutex;
@@ -19,7 +19,7 @@ using boost::asio::ssl::context;
 using boost::asio::ssl::stream;
 using boost::system::error_code;
 
-cmail::imap::connection::connection()
+cmail::imap::Connection::Connection()
     : ctx(new io_context()),
       ssl(new context(context::sslv23)),
       mtx_soc(mutex()),
@@ -30,18 +30,18 @@ cmail::imap::connection::connection()
     ssl->set_verify_mode(boost::asio::ssl::verify_none);
 }
 
-cmail::imap::connection::~connection()
+cmail::imap::Connection::~Connection()
 {
     const lock_guard<mutex> lock(mtx_soc);
     soc.lowest_layer().cancel();
     soc.lowest_layer().close();
-    spdlog::info("IMAP connection closed.");
+    spdlog::info("IMAP Connection closed.");
 }
 
-bool cmail::imap::connection::open(const string &host, int port)
+bool cmail::imap::Connection::open(const string &host, int port)
 {
     const lock_guard<mutex> lock(mtx_soc);
-    spdlog::trace("Opening connection to host %s on post %d", host, port);
+    spdlog::trace("Opening Connection to host %s on post %d", host, port);
     if(soc_connected)
     {
         spdlog::trace("Connection is already open to host %s on port %d", host, port);
@@ -60,7 +60,7 @@ bool cmail::imap::connection::open(const string &host, int port)
     }
 
     spdlog::trace("Resolved endpoints for %s:%d", host, port);
-    spdlog::trace("Sending connection request to %s on %d", host, port);
+    spdlog::trace("Sending Connection request to %s on %d", host, port);
     tcp::resolver::iterator it =  connect(soc.lowest_layer(), endpoints, error);
     if (error)
     {
@@ -68,7 +68,7 @@ bool cmail::imap::connection::open(const string &host, int port)
         return false;
     }
 
-    spdlog::trace("Established connection with host %s on %d.", host, port);
+    spdlog::trace("Established Connection with host %s on %d.", host, port);
     spdlog::trace("Initiating SSL handshake.");
     soc.handshake(stream<tcp::socket>::client, error);
     if(error)

@@ -10,15 +10,16 @@
 
 namespace cmail::imap
 {
-    class connection
+    class Connection
     {
     public:
-        explicit connection();
-        ~connection();
-        connection(connection const&) = delete;
-        connection& operator=(connection const&) = delete;
+        explicit Connection();
+        ~Connection();
+        Connection(Connection const&) = delete;
+        Connection& operator=(Connection const&) = delete;
 
         bool open(const std::string &host, int port);
+
     private:
         std::unique_ptr<boost::asio::io_context> const ctx;
         std::unique_ptr<boost::asio::ssl::context> const ssl;
