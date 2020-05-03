@@ -1,4 +1,5 @@
 #include <sstream>
+
 #include "Command.hpp"
 #include "CommandBuilder.hpp"
 
