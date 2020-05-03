@@ -1,6 +1,11 @@
 #include <mutex>
 #include <string>
 
+#include <boost/asio/read.hpp>
+#include <boost/asio/buffer.hpp>
+#include <boost/asio/buffers_iterator.hpp>
+#include <boost/asio/completion_condition.hpp>
+#include <boost/asio/streambuf.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/system/error_code.hpp>
 
@@ -13,10 +18,18 @@ using std::mutex;
 using std::string;
 using std::to_string;
 
+using boost::asio::buffer;
+using boost::asio::buffers_begin;
+using boost::asio::buffers_end;
 using boost::asio::io_context;
 using boost::asio::ip::tcp;
+using boost::asio::read;
 using boost::asio::ssl::context;
 using boost::asio::ssl::stream;
+using boost::asio::streambuf;
+using boost::asio::transfer_all;
+using boost::asio::transfer_at_least;
+using boost::asio::transfer_exactly;
 using boost::system::error_code;
 
 cmail::imap::Connection::Connection()
@@ -82,5 +95,15 @@ bool cmail::imap::Connection::open(const string &host, int port)
     spdlog::trace("SSL handshake completed.");
     soc_connected = true;
     spdlog::info("Successfully connected to host %s on %d", host, port);
+    receive();
     return soc_connected;
+}
+
+void cmail::imap::Connection::receive()
+{
+    streambuf buf;
+    size_t size = read(soc, buf, transfer_at_least(1));
+    string data(buffers_begin(buf.data()), buffers_end(buf.data()));
+    buf.consume(size);
+    spdlog::debug(data);
 }

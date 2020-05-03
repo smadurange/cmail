@@ -25,6 +25,8 @@ namespace cmail::imap
         std::unique_ptr<boost::asio::ssl::context> const ssl;
         std::mutex mtx_soc;
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> soc;
-        bool soc_connected; 
+        bool soc_connected;
+
+        void receive();
     };
 }
