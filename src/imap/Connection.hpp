@@ -28,6 +28,8 @@ namespace cmail::imap
         std::mutex mtx;
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
         bool connected;
+        std::string host;
+        int port;
         
         void send(const Command &command);
         void receive();
