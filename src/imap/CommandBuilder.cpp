@@ -13,12 +13,6 @@ cmail::imap::CommandBuilder::CommandBuilder()
 {
 }
 
-cmail::imap::CommandBuilder &cmail::imap::CommandBuilder::getInstance()
-{
-    static CommandBuilder instance;
-    return instance;
-}
-
 const Command cmail::imap::CommandBuilder::command(const string &command)
 {
     ++id;
