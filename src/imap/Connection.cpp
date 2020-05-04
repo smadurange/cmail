@@ -44,7 +44,9 @@ cmail::imap::Connection::Connection()
       ssl(new context(context::sslv23)),
       mtx(mutex()),
       socket(*ctx, *ssl),
-      connected(false)
+      connected(false),
+      host(""),
+      port(0)
 {
     spdlog::warn("SSL verify mode is set to verify_none.");
     ssl->set_verify_mode(boost::asio::ssl::verify_none);
@@ -58,7 +60,7 @@ cmail::imap::Connection::~Connection()
     spdlog::info("IMAP Connection closed.");
 }
 
-bool cmail::imap::Connection::open(const string &host, int port)
+bool cmail::imap::Connection::open(const string &h, int p)
 {
     const lock_guard<mutex> lock(mtx);
     spdlog::trace("Opening Connection to host %s on post %d", host, port);
@@ -68,6 +70,8 @@ bool cmail::imap::Connection::open(const string &host, int port)
         return true;
     }
     
+    host = h;
+    port = p;
     spdlog::trace("Resolving endpoints for %s:%d", host, port);
     error_code error;
     tcp::resolver resolver(*ctx);
