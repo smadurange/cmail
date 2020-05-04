@@ -63,50 +63,44 @@ cmail::imap::Connection::~Connection()
 bool cmail::imap::Connection::open(const string &h, int p)
 {
     const lock_guard<mutex> lock(mtx);
-    spdlog::trace("Opening Connection to host %s on post %d", host, port);
-    if(connected)
-    {
-        spdlog::trace("Connection is already open to host %s on port %d", host, port);
-        return true;
-    }
+    if(connected) return true;
     
     host = h;
     port = p;
-    spdlog::trace("Resolving endpoints for %s:%d", host, port);
-    error_code error;
+    spdlog::trace("Resolving endpoints for " + host + ".");
+    error_code ec;
     tcp::resolver resolver(*ctx);
     tcp::resolver::query query(host, to_string(port));
-    tcp::resolver::iterator endpoints = resolver.resolve(query, error);
-    if(error)
+    tcp::resolver::iterator endpoints = resolver.resolve(query, ec);
+    if(ec)
     {
-        spdlog::error("Failed to resolve endpoints for host %s: %s", host, error.message());
+        spdlog::error("Failed to resolve endpoints for " + host + ": " + ec.message());
         return false;
     }
 
-    spdlog::trace("Resolved endpoints for %s:%d", host, port);
-    spdlog::trace("Sending Connection request to %s on %d", host, port);
-    tcp::resolver::iterator it =  connect(socket.lowest_layer(), endpoints, error);
-    if (error)
+    spdlog::trace("Resolved endpoints for " + host + ".");
+    spdlog::trace("Sending connection request to " + host + " on " + to_string(port) + ".");
+    tcp::resolver::iterator it =  connect(socket.lowest_layer(), endpoints, ec);
+    if (ec)
     {
-        spdlog::error("Failed to connect to host %s on %d: %s", host, port, error.message());
+        spdlog::error("Failed to connect to " + host + ": " + ec.message());
         return false;
     }
 
-    spdlog::trace("Established Connection with host %s on %d.", host, port);
-    spdlog::trace("Initiating SSL handshake.");
-    socket.handshake(stream<tcp::socket>::client, error);
-    if(error)
+    spdlog::trace("Established connection with " + host + " on " + to_string(port) + ".");
+    spdlog::trace("Initiating SSL handshake with " + host + ".");
+    socket.handshake(stream<tcp::socket>::client, ec);
+    if(ec)
     {
-        spdlog::error("SSL handshake with host %s failed: %s", host, error.message());
+        spdlog::error("SSL handshake with " + host + " failed: " + ec.message());
         socket.lowest_layer().cancel();
         socket.shutdown();
         return false;
     }
 
-    spdlog::trace("SSL handshake completed.");
-    connected = true;
-    spdlog::info("Successfully connected to host %s on %d", host, port);
-    return connected;
+    spdlog::trace("SSL handshake with " + host + " completed.");
+    spdlog::info("Successfully opened connection to " + host + " on " + to_string(port) + ".");
+    return (connected = true);
 }
 
 void cmail::imap::Connection::send(const Command &cmd)
