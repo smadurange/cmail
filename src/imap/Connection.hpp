@@ -21,11 +21,10 @@ namespace cmail::imap
         Connection& operator=(Connection const&) = delete;
 
         bool open(const std::string &host, int port);
-
     private:
         std::unique_ptr<boost::asio::io_context> const ctx;
         std::unique_ptr<boost::asio::ssl::context> const ssl;
-        std::mutex mtx;
+        std::mutex mtx_socket;
         boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket;
         bool connected;
         std::string host;

@@ -42,7 +42,7 @@ using cmail::imap::Command;
 cmail::imap::Connection::Connection()
     : ctx(new io_context()),
       ssl(new context(context::sslv23)),
-      mtx(mutex()),
+      mtx_socket(mutex()),
       socket(*ctx, *ssl),
       connected(false),
       host(""),
@@ -54,7 +54,7 @@ cmail::imap::Connection::Connection()
 
 cmail::imap::Connection::~Connection()
 {
-    const lock_guard<mutex> lock(mtx);
+    const lock_guard<mutex> lock(mtx_socket);
     socket.lowest_layer().cancel();
     socket.lowest_layer().close();
     spdlog::info("IMAP Connection closed.");
@@ -62,7 +62,7 @@ cmail::imap::Connection::~Connection()
 
 bool cmail::imap::Connection::open(const string &h, int p)
 {
-    const lock_guard<mutex> lock(mtx);
+    const lock_guard<mutex> lock(mtx_socket);
     if(connected) return true;
     
     host = h;
@@ -105,7 +105,7 @@ bool cmail::imap::Connection::open(const string &h, int p)
 
 void cmail::imap::Connection::send(const Command &cmd)
 {
-    const lock_guard<mutex> lock(mtx);
+    const lock_guard<mutex> lock(mtx_socket);
     if(!connected)
         throw runtime_error("A connection must be opened before sending requests.");
 
