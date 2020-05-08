@@ -46,7 +46,9 @@ cmail::imap::Connection::Connection()
       socket(*ctx, *ssl),
       connected(false),
       host(""),
-      port(0)
+      port(0),
+      mtx_folder(mutex()),
+      folder("")
 {
     spdlog::warn("SSL verify mode is set to verify_none.");
     ssl->set_verify_mode(boost::asio::ssl::verify_none);

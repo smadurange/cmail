@@ -29,6 +29,8 @@ namespace cmail::imap
         bool connected;
         std::string host;
         int port;
+        std::mutex mtx_folder;
+        std::string folder;
         
         void send(const Command &command);
         void receive();
